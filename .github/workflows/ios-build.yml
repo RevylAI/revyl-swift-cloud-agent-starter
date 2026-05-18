@@ -1,0 +1,44 @@
+name: iOS - Build
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - "ios/**"
+      - ".agents/**"
+      - "AGENTS.md"
+
+concurrency:
+  group: ios-pr-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    env:
+      REVYL_ALLOW_XCODE_VERSION_MISMATCH: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build simulator app
+        working-directory: ios
+        run: |
+          bash .revyl/setup-ios-remote.sh
+          bash .revyl/build-ios-remote.sh
+
+      - name: Upload to Revyl
+        if: ${{ success() && vars.REVYL_APP_ID != '' }}
+        uses: RevylAI/revyl-gh-action/upload-build@v1
+        with:
+          app-id: ${{ vars.REVYL_APP_ID }}
+          version: ${{ github.sha }}
+          file-path: ios/build/RevylSwiftDemo.app.zip
+        env:
+          REVYL_API_KEY: ${{ secrets.REVYL_API_KEY }}
+

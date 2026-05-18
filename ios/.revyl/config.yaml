@@ -1,0 +1,18 @@
+project:
+  name: RevylSwiftDemo-ios
+  org_id: REPLACE_WITH_REVYL_ORG_ID
+
+defaults:
+  timeout: 1800
+
+build:
+  system: Xcode
+  platforms:
+    ios:
+      app_id: REPLACE_WITH_REVYL_APP_ID
+      scheme: RevylSwiftDemo
+      setup: bash .revyl/setup-ios-remote.sh
+      command: bash .revyl/build-ios-remote.sh
+      output: build/RevylSwiftDemo.app.zip
+      keep_derived_data: true
+

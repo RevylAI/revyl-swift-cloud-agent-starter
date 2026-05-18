@@ -1,0 +1,6 @@
+build/
+.revyl/cache/
+.revyl/RevylSwiftDemo.xcodeproj/
+*.xcresult
+*.xcactivitylog
+
