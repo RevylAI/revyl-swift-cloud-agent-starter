@@ -34,11 +34,21 @@ jobs:
 
       - name: Upload to Revyl
         if: ${{ success() && vars.REVYL_APP_ID != '' }}
-        uses: RevylAI/revyl-gh-action/upload-build@v1
-        with:
-          app-id: ${{ vars.REVYL_APP_ID }}
-          version: ${{ github.sha }}
-          file-path: ios/build/RevylSwiftDemo.app.zip
         env:
           REVYL_API_KEY: ${{ secrets.REVYL_API_KEY }}
-
+          REVYL_APP_ID: ${{ vars.REVYL_APP_ID }}
+        run: |
+          if [[ -z "${REVYL_API_KEY:-}" ]]; then
+            echo "REVYL_API_KEY is not set; skipping Revyl fallback upload."
+            exit 0
+          fi
+          REVYL_NO_MODIFY_PATH=1 sh -c 'curl -fsSL https://revyl.com/install.sh | sh'
+          export PATH="$HOME/.revyl/bin:$PATH"
+          revyl auth login --token "$REVYL_API_KEY"
+          revyl build upload \
+            --file ios/build/RevylSwiftDemo.app.zip \
+            --app "$REVYL_APP_ID" \
+            --platform ios \
+            --version "$GITHUB_SHA" \
+            --yes \
+            --json

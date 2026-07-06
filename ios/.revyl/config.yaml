@@ -1,18 +1,50 @@
 project:
   name: RevylSwiftDemo-ios
-  org_id: REPLACE_WITH_REVYL_ORG_ID
+  org_id: 0ac20a4e-5baf-45a8-8e98-263575a09786
 
 defaults:
   timeout: 1800
+
+# Sessions launch with these org launch vars applied automatically — no
+# --launch-var flags needed. The demo app unlocks its authenticated proof
+# screen when all four are present. Re-mint with
+# `node ../.agents/skills/ios-revyl-pr-proof/scripts/ensure-revyl-ios-auth-launch-vars.mjs --json`.
+# The demo app has no revyl-auth deep-link handler, so no deep_link here.
+auth_bypass:
+  launch_vars:
+    - REVYL_SWIFT_DEMO_TEST_LOGIN_TOKEN
+    - REVYL_SWIFT_DEMO_TEST_ACCESS_TOKEN
+    - REVYL_SWIFT_DEMO_TEST_REFRESH_TOKEN
+    - REVYL_SWIFT_DEMO_TEST_UID_TOKEN
 
 build:
   system: Xcode
   platforms:
     ios:
-      app_id: REPLACE_WITH_REVYL_APP_ID
+      app_id: e0a61f24-679f-4b1b-ba07-6a58583f2d23
       scheme: RevylSwiftDemo
-      setup: bash .revyl/setup-ios-remote.sh
-      command: bash .revyl/build-ios-remote.sh
+      setup: REVYL_ALLOW_XCODE_VERSION_MISMATCH=1 bash .revyl/setup-ios-remote.sh
+      command: REVYL_ALLOW_XCODE_VERSION_MISMATCH=1 bash .revyl/build-ios-remote.sh
       output: build/RevylSwiftDemo.app.zip
       keep_derived_data: true
 
+pr_review:
+  enabled: true
+  skip_drafts: true
+  actions:
+    preview_link: true
+    proof_of_changes: true
+  builds:
+    ios:
+      enabled: true
+      framework: native_ios
+      app: RevylSwiftDemo-ios
+      root_dir: ios
+      build_command: |
+        REVYL_ALLOW_XCODE_VERSION_MISMATCH=1 bash -lc 'set -euo pipefail; log(){ printf "[revyl-setup] %s\n" "$*"; }; expected=""; if [[ -f .xcode-version ]]; then expected="$(tr -d "[:space:]" < .xcode-version)"; elif [[ -f ../.xcode-version ]]; then expected="$(tr -d "[:space:]" < ../.xcode-version)"; fi; if [[ -n "$expected" ]]; then active="$(xcodebuild -version | sed -n "s/^Xcode //p")"; if [[ "$active" != "$expected" ]]; then selected=""; for candidate in /Applications/Xcode*.app; do [[ -d "$candidate" ]] || continue; version="$(DEVELOPER_DIR="$candidate/Contents/Developer" xcodebuild -version 2>/dev/null | sed -n "s/^Xcode //p" || true)"; if [[ "$version" == "$expected" ]]; then selected="$candidate/Contents/Developer"; break; fi; done; if [[ -n "$selected" ]]; then export DEVELOPER_DIR="$selected"; log "Selected Xcode $expected."; elif [[ "${REVYL_ALLOW_XCODE_VERSION_MISMATCH:-}" == "1" ]]; then log "Expected Xcode $expected but active Xcode is $active; continuing."; else printf "Expected Xcode %s but active Xcode is %s. Set REVYL_ALLOW_XCODE_VERSION_MISMATCH=1 to continue.\n" "$expected" "$active" >&2; exit 1; fi; else log "Active Xcode matches .xcode-version ($expected)."; fi; else log "No .xcode-version found; using active Xcode."; fi; if command -v xcodegen >/dev/null 2>&1; then xcodegen --version >/dev/null; elif command -v mint >/dev/null 2>&1; then mint run yonaskolb/XcodeGen@2.43.0 xcodegen --version >/dev/null; elif command -v brew >/dev/null 2>&1; then log "Installing XcodeGen with Homebrew."; brew install xcodegen; xcodegen --version >/dev/null; else printf "XcodeGen is required. Install it with brew install xcodegen or install Mint.\n" >&2; exit 1; fi; log "Setup complete."'
+        REVYL_ALLOW_XCODE_VERSION_MISMATCH=1 bash .revyl/build-ios-remote.sh
+      artifact_path: build/RevylSwiftDemo.app.zip
+      caches:
+        - key: revyl-swift-demo-ios-derived-data
+          paths:
+            - build/DerivedData
