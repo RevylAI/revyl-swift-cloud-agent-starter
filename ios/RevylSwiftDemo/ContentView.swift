@@ -17,6 +17,10 @@ struct ContentView: View {
                     .font(.system(size: 38, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
 
+                Text("Build channel: dev-loop-v2")
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .foregroundStyle(Color(red: 1.0, green: 0.36, blue: 0.32))
+
                 statusPanel
 
                 VStack(alignment: .leading, spacing: 8) {
@@ -58,7 +62,7 @@ struct ContentView: View {
         case .authenticated(let session):
             panel(
                 eyebrow: "Authenticated cloud-agent proof",
-                title: "The Revyl Swift Demo shows an authenticated cloud-agent proof screen.",
+                title: "The Revyl Swift Demo shows an authenticated cloud-agent proof screen: dev-loop v2 warm.",
                 detail: "Access token expires \(session.accessExpiresAt.formatted(date: .omitted, time: .shortened)); uid token expires \(session.uidExpiresAt.formatted(date: .omitted, time: .shortened)).",
                 color: Color(red: 0.35, green: 0.88, blue: 0.67)
             )
@@ -92,4 +96,3 @@ struct ContentView: View {
     ContentView()
         .environmentObject(DemoAuthState.fromLaunchConfiguration())
 }
-

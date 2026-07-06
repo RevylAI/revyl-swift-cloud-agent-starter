@@ -1,18 +1,30 @@
 project:
   name: RevylSwiftDemo-ios
-  org_id: REPLACE_WITH_REVYL_ORG_ID
+  org_id: 0ac20a4e-5baf-45a8-8e98-263575a09786
 
 defaults:
   timeout: 1800
+
+# Sessions launch with these org launch vars applied automatically — no
+# --launch-var flags needed. The demo app unlocks its authenticated proof
+# screen when all four are present. Re-mint with
+# `node ../.agents/skills/ios-revyl-pr-proof/scripts/ensure-revyl-ios-auth-launch-vars.mjs --json`.
+# The demo app has no revyl-auth deep-link handler, so no deep_link here.
+auth_bypass:
+  launch_vars:
+    - REVYL_SWIFT_DEMO_TEST_LOGIN_TOKEN
+    - REVYL_SWIFT_DEMO_TEST_ACCESS_TOKEN
+    - REVYL_SWIFT_DEMO_TEST_REFRESH_TOKEN
+    - REVYL_SWIFT_DEMO_TEST_UID_TOKEN
 
 build:
   system: Xcode
   platforms:
     ios:
-      app_id: REPLACE_WITH_REVYL_APP_ID
+      app_id: e0a61f24-679f-4b1b-ba07-6a58583f2d23
       scheme: RevylSwiftDemo
-      setup: bash .revyl/setup-ios-remote.sh
-      command: bash .revyl/build-ios-remote.sh
+      setup: REVYL_ALLOW_XCODE_VERSION_MISMATCH=1 bash .revyl/setup-ios-remote.sh
+      command: REVYL_ALLOW_XCODE_VERSION_MISMATCH=1 bash .revyl/build-ios-remote.sh
       output: build/RevylSwiftDemo.app.zip
       keep_derived_data: true
 
