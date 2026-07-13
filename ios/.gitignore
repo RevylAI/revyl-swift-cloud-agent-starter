@@ -4,3 +4,4 @@ build/
 *.xcresult
 *.xcactivitylog
 
+.revyl/device-sessions.json

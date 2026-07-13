@@ -1,0 +1,16 @@
+{
+  "name": "revyl-vercel-sandbox-proof",
+  "private": true,
+  "type": "module",
+  "description": "Runs the Revyl CLI proof loop inside an ephemeral Vercel Sandbox.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "proof": "node run-revyl-sandbox-proof.mjs"
+  },
+  "dependencies": {
+    "@vercel/sandbox": "^2.5.0",
+    "ms": "^2.1.3"
+  }
+}

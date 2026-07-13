@@ -1,13 +1,13 @@
 # Setup Guide
 
-This starter is intentionally small: one SwiftUI app, one Revyl build target, one Cursor Cloud Agent skill, and one demo auth preflight.
+This starter is intentionally small: one SwiftUI app, one Revyl build target, one Vercel Sandbox orchestrator with its proof skill, and one demo auth preflight.
 
 ## Prerequisites
 
-- macOS with Xcode installed for local validation
-- Node.js for the launch-var preflight scripts
+- Node.js 20+ for the sandbox orchestrator and preflight scripts
 - Revyl CLI authenticated against the org that owns your demo iOS app slot
-- Optional: `xcodegen`, Mint, or Homebrew. The build scripts try them in that order.
+- Vercel credentials for the sandbox demo (`VERCEL_OIDC_TOKEN`, or `VERCEL_TOKEN` + `VERCEL_TEAM_ID` + `VERCEL_PROJECT_ID`)
+- Optional, for local build validation only: macOS with Xcode, plus `xcodegen`, Mint, or Homebrew. The build scripts try them in that order.
 
 ## Configure Revyl IDs
 
@@ -27,10 +27,10 @@ Leave `scheme`, `setup`, `command`, and `output` unchanged for the starter.
 
 ## Install Or Upgrade Revyl
 
-The proof loop requires `revyl build remote`. If your local CLI is old, reinstall:
+The proof loop requires `revyl build --remote`. If your local CLI is old, reinstall:
 
 ```bash
-if ! command -v revyl >/dev/null 2>&1 || ! revyl build remote --help >/dev/null 2>&1; then
+if ! command -v revyl >/dev/null 2>&1; then
   curl -fsSL https://revyl.com/install.sh | sh
   export PATH="$HOME/.revyl/bin:$PATH"
 fi
@@ -42,7 +42,7 @@ revyl auth status
 For headless agents or CI:
 
 ```bash
-revyl auth login --token "$REVYL_API_KEY"
+revyl auth login --api-key="$REVYL_API_KEY"
 ```
 
 ## Local Build Smoke
@@ -66,13 +66,13 @@ ios/build/
 Read-only check:
 
 ```bash
-node .agents/skills/ios-revyl-pr-proof/scripts/ensure-revyl-ios-auth-launch-vars.mjs --check --json
+node .agents/skills/revyl-vercel-sandbox-proof/scripts/ensure-revyl-ios-auth-launch-vars.mjs --check --json
 ```
 
 Create or refresh the demo variables:
 
 ```bash
-node .agents/skills/ios-revyl-pr-proof/scripts/ensure-revyl-ios-auth-launch-vars.mjs --force --json
+node .agents/skills/revyl-vercel-sandbox-proof/scripts/ensure-revyl-ios-auth-launch-vars.mjs --force --json
 ```
 
 The script creates these Revyl org launch vars:
