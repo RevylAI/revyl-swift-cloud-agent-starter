@@ -44,7 +44,7 @@ struct ContentView: View {
         case .signedOut:
             panel(
                 eyebrow: "Signed out demo state",
-                title: "No Revyl launch vars were injected.",
+                title: "CURSOR PROOF: No Revyl launch vars were injected.",
                 detail: "Start a fresh Revyl device session with the four configured launch vars to unlock the proof screen.",
                 color: Color(red: 0.96, green: 0.72, blue: 0.25)
             )
